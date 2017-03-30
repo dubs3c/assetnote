@@ -1,3 +1,6 @@
 ./venv/*
 sftp-config.json
 *.pyc
+logs/
+.vagrant
+.DS_Store

@@ -1,4 +1,3 @@
-daemon = True
 accesslog = "logs/gunicorn.access.log"
 errorlog = "logs/gunicorn.error.log"
 reload = True

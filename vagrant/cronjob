@@ -1,0 +1,1 @@
+*/11 * * * * /usr/bin/timeout 30m python /var/www/assetnote/managers/threatcrowd.py > /var/www/assetnote/logs/tc_log.txt 2>&1

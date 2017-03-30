@@ -29,11 +29,11 @@ def grab_subdomains_for_domain(domain):
     try:
         api_url = "http://www.threatcrowd.org/searchApi/v2/domain/report/?domain={0}".format(domain)
         api_call = requests.get(api_url, verify=False)
-        print api_call.content
+        print(api_call.content)
         api_results = api_call.json()
         return api_results['subdomains']
     except Exception as e:
-        print str(e)
+        print(str(e))
 
 def check_if_known_in_db(subdomain, pushover_key):
     c.execute("select new_domain from sent_notifications where push_notification_key = ?", (pushover_key,))
@@ -43,9 +43,9 @@ def check_if_known_in_db(subdomain, pushover_key):
         for known_sub in already_sent:
             if known_sub[0] == subdomain:
                 should_i_send = False
-                print "[*] Already known domain found: {0}".format(subdomain)
+                print("[*] Already known domain found: {0}".format(subdomain))
     except Exception as e:
-        print "No domains found in assenote DB - results found will not be sent"
+        print("No domains found in assenote DB - results found will not be sent")
         should_i_send = False
     return should_i_send
 
@@ -53,7 +53,7 @@ def send_notification(subdomain, pushover_key, first_run):
     if first_run == "Y":
         c.execute("insert into sent_notifications(new_domain, push_notification_key, time_sent) values(?, ?, ?)", (subdomain, pushover_key, datetime.now()))
         conn.commit()
-        print "[*] First run: {0}".format(subdomain)
+        print("[*] First run: {0}".format(subdomain))
     elif first_run == "N":
         Client(pushover_key).send_message("New domain found: {0}".format(subdomain), title="Threatcrowd Notify")
         c.execute("insert into sent_notifications(new_domain, push_notification_key, time_sent) values(?, ?, ?)", (subdomain, pushover_key, datetime.now()))
@@ -74,6 +74,6 @@ for domain in all_domains_to_scan:
                     conn.commit()
             else:
                 pass
-        print "[*] Completed proccess for {0}".format(domain)
+        print("[*] Completed proccess for {0}".format(domain))
     except Exception as e:
-        print "[*] Failed: {0}".format(str(e))
+        print("[*] Failed: {0}".format(str(e)))

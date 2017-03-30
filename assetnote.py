@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, jsonify, url_for, redirect
-from flask.ext.seasurf import SeaSurf
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.security import Security, SQLAlchemyUserDatastore, \
+from flask_seasurf import SeaSurf
+from flask_sqlalchemy import SQLAlchemy
+from flask_security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required, current_user
 import sqlite3
 import config
 import sqlalchemy
+
 
 DATABASE = 'assetnote.db'
 conn = sqlite3.connect(DATABASE, check_same_thread=False)
@@ -16,9 +18,10 @@ conn.commit()
 # Initialization of variables and modules
 app = Flask(__name__)
 app.config.from_object('config')
+app.config['DEBUG'] = config.debug
 db = SQLAlchemy(app)
 csrf = SeaSurf(app)
-engine = sqlalchemy.create_engine('mysql://root:testing@localhost:3389/assetnote')
+engine = sqlalchemy.create_engine(config.SQLALCHEMY_DATABASE_URI)
 connection = engine.connect()
 
 roles_users = db.Table('roles_users',
@@ -93,7 +96,7 @@ def add_domain_api():
         conn.commit()
         return jsonify(result="success")
     except Exception as e:
-        print e
+        print(e)
         return jsonify(result=str(e))
 
 @app.route("/api/delete_domain", methods = ["POST"])
@@ -105,8 +108,8 @@ def delete_domain_api():
         conn.commit()
         return jsonify(result="success")
     except Exception as e:
-        print e
+        print(e)
         return jsonify(result=str(e))
 
 if __name__ == "__main__":
-    app.run(host= '0.0.0.0', port=80, debug=True)
+    app.run(host= '0.0.0.0', port=80)

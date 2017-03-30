@@ -1,0 +1,14 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=vagrant
+Group=vagrant
+WorkingDirectory=/var/www/assetnote/
+ExecStart=/var/www/assetnote/venv/bin/gunicorn -c vagrant/gunicorn.conf.py wsgi:app
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target
