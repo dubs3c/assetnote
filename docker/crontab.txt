@@ -1,0 +1,2 @@
+# This will run the script every 60 minutes
+*/60 * * * * python3.4 /var/www/assetnote/managers/threatcrowd.py > /var/www/assetnote/logs/tc_log.txt 2>&1

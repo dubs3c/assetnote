@@ -8,7 +8,7 @@ USERNAME="assetnote"
 USERPW="CHANGE_ME_TOO"
 
 # Database name
-DBNAME="assetnote"
+DBNAME='assetnote_db'
 
 echo -e "\n================== Provisioning has begun =================="
 
@@ -40,8 +40,9 @@ mysql -uroot -p$ROOT_DBPASSWD -e "FLUSH PRIVILEGES"
 
 
 echo -e "\n[+] Copying to /var/www/assetnote"
-cp -r /vagrant_data/ /var/www/assetnote
-chown -R vagrant:vagrant /var/www/assetnote
+#cp -r /vagrant_data/ /var/www/assetnote
+#chown -R vagrant:vagrant /var/www/assetnote
+ln -s  /vagrant_data/ /var/www/assetnote
 cd /var/www/assetnote
 #su assetnote
 
@@ -69,6 +70,9 @@ systemctl start gunicorn
 systemctl enable nginx
 systemctl start nginx
 systemctl reload nginx
+
+# Since we are using vagrant, mysql server is found at 127.0.0.1
+export DBHOST="127.0.0.1"
 
 echo -e "\n[+] Adding cronjob"
 crontab vagrant/cronjob

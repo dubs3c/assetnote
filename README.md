@@ -34,6 +34,19 @@ The core concept is that when a script within the `managers` folder finds a new 
 
 ## Installation
 
+There are three ways to install assetnote:
+
+* [Manually](#manually)
+* [Docker](#docker)
+* [Vagrant](#vagrant)
+
+You will need a pushover account for each method. Default login can be changed in `assetnote.py` at:
+```
+user_datastore.create_user(email='shubs', password='testing')
+```
+
+### Manually
+
 The installation process is annoying - if I get bugged about this enough, I'll work on making it easier.
 
 This is a full installation guide for a Debian server hosted on Digital Ocean. This should cover most people, even those with very basic devops knowlege.
@@ -103,10 +116,12 @@ Visit https://pushover.net/login and sign up:
 - `config.py`
 
 ```
+DBUSER = 'assetnote'
+ROOT_DBPASSWD = "CHANGE_ME_DAMNIT"
+DBPASS = 'CHANGE_ME_TOO'
 SECRET_KEY = 'CHANGEME'
-SQLALCHEMY_DATABASE_URI = 'mysql://root:test@localhost:3389/assetnote'
+PUSHNOTIFY_KEY = ''
 SECURITY_PASSWORD_SALT = 'CHANGEME'
-PUSHOVER_KEY = 'PUSHOVERKEY'
 ```
 
 Change the above configuration to have random, hard to guess secret keys/salts. Change the database credentials as needed.
@@ -147,6 +162,48 @@ When your user is currently in the assetnote directory, run - `pip install -r re
 `*/11 * * * * /usr/bin/timeout 30m python /home/deploy/assetnote/managers/threatcrowd.py > /home/deploy/tc_log.txt 2>&1`
 
 This will run the script every 30 minutes and with a timeout of 30 minutes. Modify the path's as needed.
+
+### Docker
+
+**Step 1**
+```
+git clone git@github.com:mjdubell/assetnote.git /var/www/assetnote
+cd /var/www/assetnote
+```
+
+**Step 2**
+Change the following values in `config.py`
+```
+ROOT_DBPASSWD = "CHANGE_ME_DAMNIT"
+DBPASS = 'CHANGE_ME_TOO'
+SECRET_KEY = 'CHANGEME'
+PUSHNOTIFY_KEY = ''
+SECURITY_PASSWORD_SALT = 'CHANGEME'
+```
+
+Reflect your changes in `Dockerfile` as well.
+```
+environment:
+    MYSQL_ROOT_PASSWORD: CHANGE_ME_DAMNIT
+    MYSQL_PASSWORD: CHANGE_ME_TOO
+```
+
+**Step 3**
+```
+docker-compose up -d
+```
+
+You'll find assetnote at *ip*:8181
+
+### Vagrant
+Vagrant is used for developing but you can use this method to easy get assetnote up and running for testing.
+
+1. Clone the repo with `git clone git@github.com:mjdubell/assetnote.git`
+2. cd vagrant/
+3. `vagrant up`
+4. `vagrant ssh`
+5. `export DBHOST="127.0.0.1"`
+6. Visit http://192.168.33.10
 
 ## Support / help
 

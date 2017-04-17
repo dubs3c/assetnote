@@ -1,11 +1,21 @@
+import os
+
 DBUSER = 'assetnote'
+ROOT_DBPASSWD = "CHANGE_ME_DAMNIT"
 DBPASS = 'CHANGE_ME_TOO'
-DBHOST = '127.0.0.1'
-DBPORT = '3306'
-DBNAME = 'assetnote'
 SECRET_KEY = 'CHANGEME'
 PUSHNOTIFY_KEY = ''
-debug=True
+
+if 'DBHOST' in os.environ:
+    # Vagrant
+    DBHOST = os.environ['DBHOST']
+else:
+    # Docker
+    DBHOST = 'database'
+
+DBPORT = '3306'
+DBNAME = 'assetnote_db'
+debug=False
 
 SQLALCHEMY_DATABASE_URI = 'mysql://{0}:{1}@{2}:{3}/{4}'.format(DBUSER, DBPASS, DBHOST, DBPORT, DBNAME)
 SQLALCHEMY_TRACK_MODIFICATIONS = False

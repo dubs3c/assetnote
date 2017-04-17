@@ -6,6 +6,7 @@ After=network.target
 User=vagrant
 Group=vagrant
 WorkingDirectory=/var/www/assetnote/
+Environment=DBHOST=127.0.0.1
 ExecStart=/var/www/assetnote/venv/bin/gunicorn -c vagrant/gunicorn.conf.py wsgi:app
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID

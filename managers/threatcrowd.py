@@ -26,14 +26,20 @@ c.execute("select * from domains")
 all_domains_to_scan = c.fetchall()
 
 def grab_subdomains_for_domain(domain):
+    api_url = "http://www.threatcrowd.org/searchApi/v2/domain/report/?domain={0}".format(domain)
     try:
-        api_url = "http://www.threatcrowd.org/searchApi/v2/domain/report/?domain={0}".format(domain)
-        api_call = requests.get(api_url, verify=False)
-        print(api_call.content)
-        api_results = api_call.json()
-        return api_results['subdomains']
+        api_call = requests.get(api_url)
+    except ConnectionError as e:
+        print("[-] Could not connect to {}, error: {}".format(api_url, str(e)))
     except Exception as e:
-        print(str(e))
+        print("[-] Something went wrong when connecting to {}, error: {}".format(api_url, str(e)))
+    else:
+        if api_call.status_code == 200:
+            print(api_call.content)
+            api_results = api_call.json()
+            return api_results['subdomains']
+        else:
+             print("[-] {} returned HTTP {}".format(api_url, api_call.status_code))
 
 def check_if_known_in_db(subdomain, pushover_key):
     c.execute("select new_domain from sent_notifications where push_notification_key = ?", (pushover_key,))
@@ -65,15 +71,19 @@ for domain in all_domains_to_scan:
     push_key = domain[3]
     domain_id = domain[0]
     subdomains_found = grab_subdomains_for_domain(target)
-    try:
-        for subdomain in subdomains_found:
-            if check_if_known_in_db(subdomain, push_key) == True:
-                send_notification(subdomain, push_key, first_run)
-                if first_run == "Y":
-                    c.execute("UPDATE domains SET first_scan = 'N' WHERE d_id = ?", (domain_id,))
-                    conn.commit()
-            else:
-                pass
-        print("[*] Completed proccess for {0}".format(domain))
-    except Exception as e:
-        print("[*] Failed: {0}".format(str(e)))
+    if subdomains_found:
+        try:
+            for subdomain in subdomains_found:
+                if check_if_known_in_db(subdomain, push_key) == True:
+                    send_notification(subdomain, push_key, first_run)
+                    if first_run == "Y":
+                        c.execute("UPDATE domains SET first_scan = 'N' WHERE d_id = ?", (domain_id,))
+                        conn.commit()
+                else:
+                    pass
+            print("[*] Completed proccess for {0}".format(domain))
+        except Exception as e:
+            print("[*] Failed: {0}".format(str(e)))
+    else:
+        print("[*] No subdomains found...")
+

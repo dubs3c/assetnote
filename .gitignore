@@ -1,6 +1,9 @@
-./venv/*
 sftp-config.json
 *.pyc
-logs/
+logs/*
+.log
 .vagrant
 .DS_Store
+docker/mysql/*
+docker/logs/*
+venv

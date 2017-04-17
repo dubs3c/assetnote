@@ -1,0 +1,34 @@
+version: '2'
+services:
+
+  gunicorn:
+    build: .
+    expose:
+      - "8080"
+    links:
+      - database
+    command: bash -c "cron && gunicorn --chdir=/var/www/assetnote -c docker/gunicorn.conf.py wsgi:app"
+    restart: always
+    volumes:
+      - ./docker/logs:/var/www/assetnote/logs
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8181:80"
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+    links:
+      - gunicorn
+
+  database:
+    image: mysql:latest
+    expose:
+      - "3306"
+    volumes:
+        - ./docker/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: CHANGE_ME_DAMNIT
+      MYSQL_PASSWORD: CHANGE_ME_TOO
+      MYSQL_USER: assetnote
+      MYSQL_DATABASE: assetnote_db
